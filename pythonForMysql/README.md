@@ -90,3 +90,56 @@ cursor.execute("create database new_databases charset utf8;")
 
 
 
+##  命令行导入外部SQL文件  
+
+首先创建`test.sql`文件 
+
+```powershell
+create database test charset utf8;
+show databases;
+```
+
+外部导入
+
+```powershell
+mysql -uroot -p < test.sql
+```
+
+连接后导入 
+
+```powershell
+mysql -uroot -p
+>source test.sql
+```
+
+
+
+##  数据表管理  
+
+数据库实际上就是多个表组成的，表中存储着数据。
+数据表也是数据库最重要的组成部分之一，我们绝大多数情况下都是在跟表打交道。
+例如从表里查找一些数据，删除表中的某些数据，更新表中的某些数据等等。
+
+数据表由**行（row）**和**列(column)**组成，是一个二维的网格结构，每个列都是一个字段。
+字段由字段名称和字段的**数据类型**以及一些**约束条件**组成
+表中至少要有一列，可以有多行或0行，**表名要唯一**
+
+
+
+###  创建数据表  
+
+```mysql
+create table class(
+id int primary key AUTO_INCREMENT,
+cname varchar(30) NOT NULL,
+description varchar(100) default NULL)
+charset utf8
+```
+
+以上操作创建一个表`class`，说明如下：
+
+* 字段id为主键自增
+* 字段cname为字符串类型varchar并不允许为null值
+* 字段description可为null字符串
+* 字符集为utf8，如果不设置将继承数据库字符集  
+

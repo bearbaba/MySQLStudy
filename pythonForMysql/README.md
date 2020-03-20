@@ -143,3 +143,42 @@ charset utf8
 * 字段description可为null字符串
 * 字符集为utf8，如果不设置将继承数据库字符集  
 
+创建完表后就可以插入数据  
+
+```mysql
+INSERT INTO class (cname,description) VALUES('PHP','史上最强');
+INSERT INTO class (cname) VALUES('Mysql');
+```
+
+
+
+pymysql模块是默认开启mysql的事务功能的，因此，进行 "增"、 "删"、"改"表内数据的时候，一定要使用`db.commit()`提交事务，否则就看不见所插入的数据。
+
+因此使用`cursor.execute(sql)`执行SQL的插入语句后，一定要使用`db.commit()`提交事务。
+
+上述的sql插入语句在python中可以改为:  
+
+```python
+sql="INSERT INTO class (cname,description) VALUES(%s,%s)"
+cursor.execute(sql,('PHP','史上最强'))
+db.commit()
+```
+
+如果要同时插入多条的语句可以使用`cursor.executemany()`，
+
+```python
+sql="INSERT INTO class (cname,description) VALUES(%s,%s)"
+cursor,executemany(sql,[('PHP','史上最强'),('python','人生苦短')])
+db.commit()
+```
+
+
+
+###  复制数据  
+
+根据已经存在的表结构创建新表
+
+```mysql
+create table test like class;
+```
+

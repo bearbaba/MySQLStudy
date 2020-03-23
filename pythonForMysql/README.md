@@ -156,6 +156,8 @@ pymysql模块是默认开启mysql的事务功能的，因此，进行 "增"、 "
 
 因此使用`cursor.execute(sql)`执行SQL的插入语句后，一定要使用`db.commit()`提交事务。
 
+
+
 上述的sql插入语句在python中可以改为:  
 
 ```python
@@ -174,11 +176,244 @@ db.commit()
 
 
 
-###  复制数据  
+对于插入或者删除表中数据的操作时，务必要使用`try... except..`结构，如果对这些数据进行的操作失败后，就进行回滚操作，避免操作失败影响之后的数据的插入删除。  
+
+```mysql
+try:
+	sql="INSERT INTO class (cname,description) VALUES(%s,%s)"
+	cursor.execute(sql,('PHP','史上最强'))
+	db.commit()
+	print("插入成功")
+except:
+	print("插入失败")
+	db.rollback()
+```
+
+
+
+
+
+###  表的操作
+
+查看数据库内的所有表
+
+```mysql
+show tables;
+```
+
+
 
 根据已经存在的表结构创建新表
 
 ```mysql
 create table test like class;
+```
+
+修改表名
+
+```mysql
+ALTER TABLE stu RENAME stus;
+```
+
+另一种方式修改表名
+
+```mysql
+RENAME TABLE stus to stu;
+```
+
+
+
+更改表的字符集
+
+```mysql
+ALTER TABLE class charset gbk;
+```
+
+
+
+删除表的所有数据
+
+```mysql
+TRUNCATE stu;
+```
+
+删除表
+
+```mysql
+DROP TABLE IF EXISTS stu;
+```
+
+
+
+查看表的内容
+
+```mysql
+desc tablename;
+```
+
+
+
+在`python`中查看表内容  
+
+1. `fetchall`一次获取所有记录
+
+```mysql
+import  pymysql
+
+db = pymysql.connect(host='localhost',user='root',db='huangwei',
+                     password='123456',port=3306,charset='utf8')
+
+cursor = db.cursor()
+
+cursor.execute('select name,age from person')
+aa = cursor.fetchall()
+# print(aa)
+for a,b in aa:
+    c = "我的名字叫{}，今年{}岁".format(a,b)
+    display(c)
+db.close()
+```
+
+
+
+2. 使用`pandas`查看内容
+
+使用pandas中的read_sql()方法，将提取到的数据直接转化为DataFrame，进行操作
+
+```mysql
+import pymysql 
+import pandas as pd
+
+db = pymysql.connect(host='localhost',user='root',db='huangwei',
+                     password='123456',port=3306,charset='utf8')
+cursor = db.cursor()
+
+df1 = pd.read_sql("select * from student where ssex='男'",db)
+display(df1)
+df2 = pd.read_sql("select * from student where ssex='女'",db)
+display(df2)
+```
+
+
+
+修改表类型  
+
+例如，修改表emp的ename字段定义，将`varchar(10)`改为`varchar(20)`：   
+
+```mysql
+alter table emp modify ename varchar(20);
+```
+
+
+
+增加表字段  
+
+例如，表emp上新增加字段age，类型为int(3)：
+
+```mysql
+alter table emp add column age int(3);
+```
+
+
+
+删除表字段
+
+例如，删除表emp上的age列：
+
+```mysql
+alter table emp drop column age;
+```
+
+
+
+更改列的名称  
+
+例如，将表emp上的age列改名为age1列,同时将字段更改为int(4)：
+
+```mysql
+alter table emp change age age1 int(4);
+```
+
+`change`能更改列的名称，在使用时必须要指明列的字段类型，不然会报错。
+
+
+
+修改字段的排列顺序  
+
+在字段增加和修改语法（ADD/CHANGE/MODIFY）中都有一个可选项`first|after column_name`，这个选项可修改字段在表中的位置，默认`add`增加的新字段是加在表的最后的位置，而`change/modify`默认不会更改字段的位置。  
+
+例如，将新增的字段birth date（data是字段类型）加在ename之后，需要指明字段类型。  
+
+```mysql
+alter table emp add birth date after ename;
+```
+
+例如，修改字段age，将它放在最前面：
+
+```mysql
+alter table emp modify age int(3) first;
+```
+
+
+
+##  DML语句  
+
+DML操作是指对数据库中表记录的操作，主要包括表记录的插入（insert）、更新（update）、删除（delete）和查询（select）。
+
+###  插入记录  
+
+插入记录的基本语法为：
+`INSERT INTO tablename (field1,field2,.....,fieldn) VALUES (value1, value2,......valuesn);` 
+
+例如：向表emp中插入一下记录：ename为zzx1，hiredate为2000-01-01，sal为2000，deptno为1，命令执行为：
+
+```mysql
+insert into emp (ename, hiredate,sal,deptno) values('zzx1','2000-01-01','2000',1);
+```
+
+也可以不用指定字段名称，但是`values`后面的顺序和字段的排列顺序一致：
+
+```mysql
+insert into emp values ('zzx1','2000-01-01','2000',1)
+```
+
+可以一次插入大量数据：
+
+```mysql
+INSERT INTO tablename (field1, field2,……fieldn)
+VALUES
+(record1_value1, record1_value2,……record1_valuesn),
+(record2_value1, record2_value2,……record2_valuesn),
+……
+(recordn_value1, recordn_value2,……recordn_valuesn)
+;
+```
+
+
+
+###  更行记录  
+
+对于表里的记录值，可以通过`update`命令进行更改，语法如下：
+
+```mysql
+UPDATE tablename SET field = vluae1,field=value2, ....fieldn=valuen[WHERE CONDITION]
+```
+
+例如，将表emp中ename为“lisa”的薪水（sal）从3000更改为4000： 
+
+```mysql
+update emp set sal=4000 where ename="lisa";
+```
+
+在MySQL中，update可以同时更新多个表中数据，语法为：
+
+```mysql
+update t1,t2...tn set t1.field1=expr1,tn.fieldn=exprn [WHERE CONDITION]
+```
+
+在下例中，同时更新表emp中的字段sal和表dept中的字段deptname：
+
+```mysql
+update emp a,dept b set a.sal=a.sal*b.deptname=a.ename where a.deptno = b.deptno;
 ```
 

@@ -391,7 +391,7 @@ VALUES
 
 
 
-###  更行记录  
+###  更新记录  
 
 对于表里的记录值，可以通过`update`命令进行更改，语法如下：
 
@@ -415,5 +415,37 @@ update t1,t2...tn set t1.field1=expr1,tn.fieldn=exprn [WHERE CONDITION]
 
 ```mysql
 update emp a,dept b set a.sal=a.sal*b.deptname=a.ename where a.deptno = b.deptno;
+```
+
+
+
+###  删除记录  
+
+可以使用`delete`命令进行删除，语法为：  
+
+```mysql
+DELETE FROM tablename [WHERE CONDITION]
+```
+
+例如，在emp中将ename为‘dony’的记录全部删除：
+
+```mysql
+delete from emp where ename='dony';
+```
+
+
+
+在MySQL中可以一次删除多个表的数据，语法为：
+
+```mysql
+DELETE t1,t2...tn FROM t1,t2...tn [WHERE CONDITION]
+```
+
+
+
+例，将表 emp 和 dept 中 deptno 为 3 的记录同时都删除：
+
+```mysql
+delete a,b from emp a,dept b where a.deptno=b.deptno and a.deptno=3;
 ```
 

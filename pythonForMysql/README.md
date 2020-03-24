@@ -417,6 +417,8 @@ update t1,t2...tn set t1.field1=expr1,tn.fieldn=exprn [WHERE CONDITION]
 update emp a,dept b set a.sal=a.sal*b.deptname=a.ename where a.deptno = b.deptno;
 ```
 
+上例中a是emp的别名，b是dept的别名，可见设置别名只需在表名后附上别名即可。
+
 
 
 ###  删除记录  
@@ -448,4 +450,8 @@ DELETE t1,t2...tn FROM t1,t2...tn [WHERE CONDITION]
 ```mysql
 delete a,b from emp a,dept b where a.deptno=b.deptno and a.deptno=3;
 ```
+
+如果 from 后面的表名用别名，则 delete 后面的也要用相应的别名，否则会提示语法错误。
+
+
 

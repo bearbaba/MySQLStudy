@@ -417,7 +417,13 @@ update t1,t2...tn set t1.field1=expr1,tn.fieldn=exprn [WHERE CONDITION]
 update emp a,dept b set a.sal=a.sal*b.deptname=a.ename where a.deptno = b.deptno;
 ```
 
-上例中a是emp的别名，b是dept的别名，可见设置别名只需在表名后附上别名即可。
+上例中a是emp的别名，b是dept的别名。  
+
+
+
+###  别名设置  
+
+在DML中为表设置别名可以在表名后用`as 表别名`的方式设置表的别名，as可忽略不写。 
 
 
 

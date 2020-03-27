@@ -1,4 +1,4 @@
-#  `MySQL`的学习
+# `MySQL`的学习
 
 为了能更好查看执行的结果，采用`Python`与`MySQL`进行交互。
 
@@ -8,9 +8,9 @@
 pip install pymysql
 ```
 
-##  连接操作
+## 连接操作
 
-###  在命令行内连接数据库 
+### 在命令行内连接数据库
 
 ```powershell
 mysql -uroot -p -P3306 -h 127.0.0.1
@@ -40,11 +40,9 @@ mysql -uroot -p -e"show databases;"
 
 使用`exit`可退出连接
 
+## 数据库的创建、使用、删除  
 
-
-##  数据库的创建、使用、删除  
-
-###  在`Python`中连接数据库  
+### 在`Python`中连接数据库  
 
 ```python
 import pymysql
@@ -54,45 +52,37 @@ db=pymysql.connect(host="localhost",user="root",password="123456",port=3306,char
 
 在使用完后使用`db.close()`关闭数据库。  
 
+### 命令行创建数据库
 
-
-###  命令行创建数据库   
-
-在命令行中使用`create database 数据库名字 charset utf8; ` ，数据库名字自定义，`charset utf8`表明该数据库使用的编码方式是utf-8。MySQL使用`;`表示语句的结束。
+在命令行中使用`create database 数据库名字 charset utf8;`，数据库名字自定义，`charset utf8`表明该数据库使用的编码方式是utf-8。MySQL使用`;`表示语句的结束。
 
 创建完数据库后即可使用`show databases;`命令查看所有的数据库，
 
-###  python创建数据库  
+### python创建数据库  
 
-在python内在连接数据库之后，可以通过`cursor=db.cursor()`开启MySQL的游标功能，创建一个游标对象，再通过执行`cursor.execute(sql)#sql表示要执行的SQL语句` 
+在python内在连接数据库之后，可以通过`cursor=db.cursor()`开启MySQL的游标功能，创建一个游标对象，再通过执行`cursor.execute(sql)#sql表示要执行的SQL语句`，
 
 例如创建数据库
 
 ```python
-import pymysql 
+import pymysql
 db=pymysql.connect(host='localhost',user='root', password='123456',
-                   port=3306, db='huangwei', charset='utf8')              
+                   port=3306, db='huangwei', charset='utf8')
 cursor = db.cursor()
 cursor.execute("create database new_databases charset utf8;")
 ```
 
-
-
-###  使用数据库  
+### 使用数据库  
 
 在命令行中用`use 数据库名;`即可使用数据库，python中同样在`execute()`中可以直接执行这句命令。  
 
-
-
-###  删除数据库  
+### 删除数据库  
 
 使用`drop database 数据库名`的方式进行删除操作，为防止删除不存在的数据库可以增加条件`drop database if exists houdunren;`
 
+## 命令行导入外部SQL文件  
 
-
-##  命令行导入外部SQL文件  
-
-首先创建`test.sql`文件 
+首先创建`test.sql`文件
 
 ```powershell
 create database test charset utf8;
@@ -105,16 +95,14 @@ show databases;
 mysql -uroot -p < test.sql
 ```
 
-连接后导入 
+连接后导入
 
 ```powershell
 mysql -uroot -p
 >source test.sql
 ```
 
-
-
-##  数据表管理  
+## 数据表管理  
 
 数据库实际上就是多个表组成的，表中存储着数据。
 数据表也是数据库最重要的组成部分之一，我们绝大多数情况下都是在跟表打交道。
@@ -124,9 +112,7 @@ mysql -uroot -p
 字段由字段名称和字段的**数据类型**以及一些**约束条件**组成
 表中至少要有一列，可以有多行或0行，**表名要唯一**
 
-
-
-###  创建数据表  
+### 创建数据表  
 
 ```mysql
 create table class(
@@ -150,13 +136,9 @@ INSERT INTO class (cname,description) VALUES('PHP','史上最强');
 INSERT INTO class (cname) VALUES('Mysql');
 ```
 
-
-
 pymysql模块是默认开启mysql的事务功能的，因此，进行 "增"、 "删"、"改"表内数据的时候，一定要使用`db.commit()`提交事务，否则就看不见所插入的数据。
 
 因此使用`cursor.execute(sql)`执行SQL的插入语句后，一定要使用`db.commit()`提交事务。
-
-
 
 上述的sql插入语句在python中可以改为:  
 
@@ -174,11 +156,9 @@ cursor,executemany(sql,[('PHP','史上最强'),('python','人生苦短')])
 db.commit()
 ```
 
-
-
 对于插入或者删除表中数据的操作时，务必要使用`try... except..`结构，如果对这些数据进行的操作失败后，就进行回滚操作，避免操作失败影响之后的数据的插入删除。  
 
-```mysql
+```python
 try:
 	sql="INSERT INTO class (cname,description) VALUES(%s,%s)"
 	cursor.execute(sql,('PHP','史上最强'))
@@ -189,19 +169,13 @@ except:
 	db.rollback()
 ```
 
-
-
-
-
-###  表的操作
+### 表的操作
 
 查看数据库内的所有表
 
 ```mysql
 show tables;
 ```
-
-
 
 根据已经存在的表结构创建新表
 
@@ -221,15 +195,11 @@ ALTER TABLE stu RENAME stus;
 RENAME TABLE stus to stu;
 ```
 
-
-
 更改表的字符集
 
 ```mysql
 ALTER TABLE class charset gbk;
 ```
-
-
 
 删除表的所有数据
 
@@ -243,19 +213,15 @@ TRUNCATE stu;
 DROP TABLE IF EXISTS stu;
 ```
 
-
-
 查看表的内容
 
 ```mysql
 desc tablename;
 ```
 
-
-
 在`python`中查看表内容  
 
-1. `fetchall`一次获取所有记录
+`fetchall`一次获取所有记录
 
 ```mysql
 import  pymysql
@@ -274,14 +240,12 @@ for a,b in aa:
 db.close()
 ```
 
-
-
-2. 使用`pandas`查看内容
+使用`pandas`查看内容
 
 使用pandas中的read_sql()方法，将提取到的数据直接转化为DataFrame，进行操作
 
 ```mysql
-import pymysql 
+import pymysql
 import pandas as pd
 
 db = pymysql.connect(host='localhost',user='root',db='huangwei',
@@ -294,17 +258,13 @@ df2 = pd.read_sql("select * from student where ssex='女'",db)
 display(df2)
 ```
 
-
-
 修改表类型  
 
-例如，修改表emp的ename字段定义，将`varchar(10)`改为`varchar(20)`：   
+例如，修改表emp的ename字段定义，将`varchar(10)`改为`varchar(20)`:
 
 ```mysql
 alter table emp modify ename varchar(20);
 ```
-
-
 
 增加表字段  
 
@@ -314,8 +274,6 @@ alter table emp modify ename varchar(20);
 alter table emp add column age int(3);
 ```
 
-
-
 删除表字段
 
 例如，删除表emp上的age列：
@@ -323,8 +281,6 @@ alter table emp add column age int(3);
 ```mysql
 alter table emp drop column age;
 ```
-
-
 
 更改列的名称  
 
@@ -335,8 +291,6 @@ alter table emp change age age1 int(4);
 ```
 
 `change`能更改列的名称，在使用时必须要指明列的字段类型，不然会报错。
-
-
 
 修改字段的排列顺序  
 
@@ -354,16 +308,14 @@ alter table emp add birth date after ename;
 alter table emp modify age int(3) first;
 ```
 
-
-
-##  DML语句  
+## DML语句  
 
 DML操作是指对数据库中表记录的操作，主要包括表记录的插入（insert）、更新（update）、删除（delete）和查询（select）。
 
-###  插入记录  
+### 插入记录  
 
 插入记录的基本语法为：
-`INSERT INTO tablename (field1,field2,.....,fieldn) VALUES (value1, value2,......valuesn);` 
+`INSERT INTO tablename (field1,field2,.....,fieldn) VALUES (value1, value2,......valuesn);`
 
 例如：向表emp中插入一下记录：ename为zzx1，hiredate为2000-01-01，sal为2000，deptno为1，命令执行为：
 
@@ -389,9 +341,7 @@ VALUES
 ;
 ```
 
-
-
-###  更新记录  
+### 更新记录  
 
 对于表里的记录值，可以通过`update`命令进行更改，语法如下：
 
@@ -399,7 +349,7 @@ VALUES
 UPDATE tablename SET field = vluae1,field=value2, ....fieldn=valuen[WHERE CONDITION]
 ```
 
-例如，将表emp中ename为“lisa”的薪水（sal）从3000更改为4000： 
+例如，将表emp中ename为“lisa”的薪水（sal）从3000更改为4000：
 
 ```mysql
 update emp set sal=4000 where ename="lisa";
@@ -419,15 +369,11 @@ update emp a,dept b set a.sal=a.sal*b.deptname=a.ename where a.deptno = b.deptno
 
 上例中a是emp的别名，b是dept的别名。  
 
+### 别名设置  
 
+在DML中为表设置别名可以在表名后用`as 表别名`的方式设置表的别名，as可忽略不写。
 
-###  别名设置  
-
-在DML中为表设置别名可以在表名后用`as 表别名`的方式设置表的别名，as可忽略不写。 
-
-
-
-###  删除记录  
+### 删除记录  
 
 可以使用`delete`命令进行删除，语法为：  
 
@@ -441,15 +387,11 @@ DELETE FROM tablename [WHERE CONDITION]
 delete from emp where ename='dony';
 ```
 
-
-
 在MySQL中可以一次删除多个表的数据，语法为：
 
 ```mysql
 DELETE t1,t2...tn FROM t1,t2...tn [WHERE CONDITION]
 ```
-
-
 
 例，将表 emp 和 dept 中 deptno 为 3 的记录同时都删除：
 
@@ -459,5 +401,76 @@ delete a,b from emp a,dept b where a.deptno=b.deptno and a.deptno=3;
 
 如果 from 后面的表名用别名，则 delete 后面的也要用相应的别名，否则会提示语法错误。
 
+### 查询语句
 
+1.查询emp表所有的数据
 
+`select * from emp;`
+
+2.查询10号部门工资大于2000的员工信息
+
+`select * from emp where deptno = 10`
+
+3.查询所有员工信息
+
+`select * from emp`
+
+4.查询10号部门工资大于2000的员工信息
+
+`select * from emp where deptno = 10 and sal > 2000`
+
+5.查询员工编号为7369,7788,7521的员工信息（组合）
+
+`select *  emp where empno =7369 or empno = 7521`
+
+6.查询emp工资在1000到2000之间的员工信息（范围查询）
+
+`select * from emp where sal between and 2000`
+
+7.查询员工编号为7369,7788,7521的员工信息（集合查询）
+
+`select * from emp where empno in (7369,7521,7788)`
+
+8.查询员工的名称和部门编号设置别名（使用as设置别名，as可以省略）
+
+`select empno as 员工编号, ename 员工姓名 from emp`
+
+9.查询emp中所有的职位信息
+
+`select job from emp;`
+
+`select distinct job from emp;#去重操作`
+
+10.判断某个字段是否为null，使用is判断,is not null 判断不是null值
+
+查询emp表中中没有奖金的员工信息
+
+`select * from emp where comm is not null`
+
+11.模糊查询
+
+```mysql
+1.查询员工名字以s开头
+%代表0~多个字符 下划线代表一位字符
+select * from emp where ename like 's%'
+2.查询员工名称包含L
+select * from emp where ename like '%L%'
+3.查询员工名称第二个字是L的
+select * from emp where ename like '%_L%'
+4.查询员工名称结尾为n
+%n
+select * from emp where ename like '%n'
+
+```
+
+12.按照工资升序排序（order by）,如果工资一样，按照编号降序排序(desc)，升序是（asc）
+
+`select * from emp order by sal,empno desc`
+
+显示前五条信息
+
+`select * from emp limit 5;`
+
+完整写法是`select * from emp limit 0,5;`限制结果0到5，
+
+limit 第一个参数表示从哪开始，第二个表示需要进行切片的长度，例如上述5为切片长度为5。
